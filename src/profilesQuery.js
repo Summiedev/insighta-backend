@@ -13,7 +13,7 @@ function buildSearchQueryRaw(reqQuery, nlFilters) {
 }
 
 function buildPaginationMeta(req, page, limit, total, fallbackPath) {
-  const totalPages = total === 0 ? 0 : Math.ceil(total / page);
+  const totalPages = total === 0 ? 0 : Math.ceil(total / limit);
   return {
     page: Number(page),
     limit: Number(limit),

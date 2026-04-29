@@ -1,1 +1,0 @@
-module.exports = require('../../../../../api/profiles/search/index');
