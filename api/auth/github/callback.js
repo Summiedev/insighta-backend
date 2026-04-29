@@ -1,0 +1,1 @@
+module.exports = require('../../../api/v1/auth/github/callback');
