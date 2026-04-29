@@ -18,7 +18,7 @@ It is consumed by the CLI and the web portal, but those interfaces are documente
 ## Architecture
 
 - Runtime: Node.js 18+
-- Deployment model: one Vercel catch-all function in `api/[...all].js` that dispatches all backend routes
+- Deployment model: Vercel serverless functions in `api/`
 - Database: MongoDB Atlas via the native `mongodb` driver
 - IDs: UUID v7
 - Auth model: GitHub OAuth + PKCE + JWT access/refresh tokens
@@ -28,10 +28,31 @@ It is consumed by the CLI and the web portal, but those interfaces are documente
 
 ```text
 api/
-  [...all].js
+  health.js
+  seed.js
+  auth/
+    github.js
+    callback.js
+    me.js
+  v1/
+    auth/
+      github/
+        login.js
+        callback.js
+      me.js
+      refresh.js
+      logout.js
+    admin/
+      users/
+        index.js
+  profiles/
+    index.js
+    [id].js
+    export.js
+    search/
+      index.js
 src/
   auth.js
-  apiRouter.js
   db.js
   helpers.js
   nlParser.js
@@ -39,8 +60,6 @@ src/
   profileService.js
   uuidv7.js
 ```
-
-All request paths are preserved exactly through the router, including the versioned aliases under `/api/v1/*`.
 
 ## Authentication System
 
@@ -286,7 +305,6 @@ The backend should be reachable on `http://localhost:3000` during local developm
 - Workflow: `.github/workflows/backend-ci-cd.yml`
 - Required checks: lint, tests, build, deploy
 - Target: production backend deployment on push to `main`
-- Vercel Hobby compatible: the deployment uses a single serverless function instead of one function per route
 
 ## Stage 3 Summary
 

@@ -3,3 +3,5 @@ node_modules/
 *.db
 .vercel/
 task1.zip
+
+.vercel

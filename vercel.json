@@ -1,0 +1,40 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/auth/github",
+      "destination": "/api/v1/auth/github/login"
+    },
+    {
+      "source": "/api/auth/github/callback",
+      "destination": "/api/v1/auth/github/callback"
+    },
+    {
+      "source": "/api/auth/refresh",
+      "destination": "/api/v1/auth/refresh"
+    },
+    {
+      "source": "/api/auth/logout",
+      "destination": "/api/v1/auth/logout"
+    },
+    {
+      "source": "/api/profiles/:id",
+      "destination": "/api/profiles?id=:id"
+    },
+    {
+      "source": "/api/v1/profiles",
+      "destination": "/api/profiles"
+    },
+    {
+      "source": "/api/v1/profiles/:id",
+      "destination": "/api/profiles?id=:id"
+    },
+    {
+      "source": "/api/v1/profiles/search",
+      "destination": "/api/profiles/search"
+    },
+    {
+      "source": "/api/v1/profiles/export",
+      "destination": "/api/profiles/export"
+    }
+  ]
+}
