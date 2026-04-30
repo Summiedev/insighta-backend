@@ -20,7 +20,7 @@ async function handler(req, res) {
   try {
     config = getAuthConfig();
   } catch (err) {
-    console.error('POST /api/v1/auth/logout configuration error:', err);
+    console.error('POST /auth/logout configuration error:', err);
     return res.status(500).json({ status: 'error', message: 'Auth service misconfigured' });
   }
 
@@ -52,12 +52,12 @@ async function handler(req, res) {
     res.setHeader('Set-Cookie', buildClearAuthCookieHeaders(config));
     return res.status(200).json({ status: 'success', message: 'Logged out' });
   } catch (err) {
-    console.error('POST /api/v1/auth/logout error:', err);
+    console.error('POST /auth/logout error:', err);
     return res.status(500).json({ status: 'error', message: 'Internal server error' });
   }
 }
 
 module.exports = applyObservability(handler, {
-  routeId: 'POST /api/v1/auth/logout',
+  routeId: 'POST /auth/logout',
   policy: RATE_LIMIT_POLICIES.authStrict,
 });

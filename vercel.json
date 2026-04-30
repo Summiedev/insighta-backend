@@ -1,20 +1,32 @@
 {
   "rewrites": [
     {
-      "source": "/api/auth/github",
+      "source": "/auth/github",
       "destination": "/api/v1/auth/github/login"
     },
     {
-      "source": "/api/auth/github/callback",
+      "source": "/auth/github/callback",
       "destination": "/api/v1/auth/github/callback"
     },
     {
-      "source": "/api/auth/refresh",
+      "source": "/auth/me",
+      "destination": "/api/v1/auth/me"
+    },
+    {
+      "source": "/auth/refresh",
       "destination": "/api/v1/auth/refresh"
     },
     {
-      "source": "/api/auth/logout",
+      "source": "/auth/logout",
       "destination": "/api/v1/auth/logout"
+    },
+    {
+      "source": "/health",
+      "destination": "/api/health"
+    },
+    {
+      "source": "/seed",
+      "destination": "/api/seed"
     },
     {
       "source": "/api/profiles/:id",

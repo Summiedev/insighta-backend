@@ -8,7 +8,7 @@
  * Usage (run locally or as a one-off script):
  *   node src/seed.js
  *
- * Or POST /api/seed to trigger remotely (protected by SEED_SECRET env var).
+ * Or POST /seed to trigger remotely (protected by SEED_SECRET env var).
  */
 
 require('dotenv').config({ path: require('path').join(__dirname, '../.env') });

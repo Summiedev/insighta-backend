@@ -27,7 +27,7 @@ async function handler(req, res) {
   try {
     config = getAuthConfig();
   } catch (err) {
-    console.error('POST /api/v1/auth/refresh configuration error:', err);
+    console.error('POST /auth/refresh configuration error:', err);
     return res.status(500).json({ status: 'error', message: 'Auth service misconfigured' });
   }
 
@@ -129,12 +129,12 @@ async function handler(req, res) {
       refresh_expires_in: REFRESH_TOKEN_TTL_SECONDS,
     });
   } catch (err) {
-    console.error('POST /api/v1/auth/refresh error:', err);
+    console.error('POST /auth/refresh error:', err);
     return res.status(500).json({ status: 'error', message: 'Internal server error' });
   }
 }
 
 module.exports = applyObservability(handler, {
-  routeId: 'POST /api/v1/auth/refresh',
+  routeId: 'POST /auth/refresh',
   policy: RATE_LIMIT_POLICIES.authStrict,
 });

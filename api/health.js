@@ -33,7 +33,7 @@ async function handler(req, res) {
 
 module.exports = protect(
   applyObservability(handler, {
-    routeId: 'GET /api/health',
+    routeId: 'GET /health',
     policy: RATE_LIMIT_POLICIES.queryStandard,
   }),
   ['analyst', 'admin']

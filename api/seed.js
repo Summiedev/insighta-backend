@@ -1,8 +1,8 @@
 /**
- * POST /api/seed  — triggers database seeding (idempotent).
+ * POST /seed  — triggers database seeding (idempotent).
  *
  * Protected by the SEED_SECRET environment variable.
- * Call with: POST /api/seed  and header  x-seed-secret: <your-secret>
+ * Call with: POST /seed  and header  x-seed-secret: <your-secret>
  *
  * This endpoint exists so you can seed the database without SSH/console access.
  */
@@ -99,14 +99,14 @@ async function handler(req, res) {
     const total = await col.countDocuments();
     return res.status(200).json({ status: 'success', inserted, skipped, total });
   } catch (err) {
-    console.error('POST /api/seed error:', err);
+    console.error('POST /seed error:', err);
     return res.status(500).json({ status: 'error', message: 'Internal server error' });
   }
 }
 
 module.exports = protect(
   applyObservability(handler, {
-    routeId: 'POST /api/seed',
+    routeId: 'POST /seed',
     policy: RATE_LIMIT_POLICIES.authStrict,
   }),
   ['admin']

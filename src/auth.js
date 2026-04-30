@@ -194,7 +194,7 @@ function buildAuthSetCookieHeaders(accessToken, refreshToken, config) {
     }),
     serializeCookie('refresh_token', refreshToken, {
       ...baseOptions,
-      path: '/api/v1/auth',
+      path: '/auth',
       maxAge: REFRESH_TOKEN_TTL_SECONDS,
     }),
   ];
@@ -211,7 +211,7 @@ function buildClearAuthCookieHeaders(config) {
 
   return [
     serializeCookie('access_token', '', { ...baseOptions, path: '/' }),
-    serializeCookie('refresh_token', '', { ...baseOptions, path: '/api/v1/auth' }),
+    serializeCookie('refresh_token', '', { ...baseOptions, path: '/auth' }),
   ];
 }
 

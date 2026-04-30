@@ -24,7 +24,7 @@ async function handler(req, res) {
   try {
     config = getAuthConfig();
   } catch (err) {
-    console.error('GET /api/v1/auth/github/login configuration error:', err);
+    console.error('GET /auth/github configuration error:', err);
     return res.status(500).json({ status: 'error', message: 'Auth service misconfigured' });
   }
 
@@ -34,17 +34,14 @@ async function handler(req, res) {
 
   const cliRedirectUri = String(req.query.redirect_uri || req.query.redirectUri || '').trim();
   if (clientMode === 'cli' && cliRedirectUri) {
-    const isLocalCallback = /^https?:\/\/(127\.0\.0\.1|localhost)(:\d+)?\/(callback|api\/auth\/github\/callback|api\/auth\/callback\/github)\/?$/i.test(cliRedirectUri);
+    const isLocalCallback = /^https?:\/\/(127\.0\.0\.1|localhost)(:\d+)?\/(callback|auth\/github\/callback)\/?$/i.test(cliRedirectUri);
     let isDeployedCallback = false;
     try {
       const configured = new URL(config.githubRedirectUri);
       const requested = new URL(cliRedirectUri);
       const sameOrigin = configured.origin === requested.origin;
       const deployedPath = requested.pathname.replace(/\/+$/, '');
-      isDeployedCallback = sameOrigin && (
-        deployedPath === '/api/auth/github/callback'
-        || deployedPath === '/api/v1/auth/github/callback'
-      );
+      isDeployedCallback = sameOrigin && deployedPath === '/auth/github/callback';
     } catch (_err) {
       isDeployedCallback = false;
     }
@@ -75,7 +72,7 @@ async function handler(req, res) {
       const host = req.headers['x-forwarded-host'] || req.headers.host || `localhost:${process.env.PORT || 3000}`;
       // Ensure we create a host without path, keep port when present
       const origin = host.startsWith('localhost') || host.includes(':') ? `${proto}://${host}` : `${proto}://${host}`;
-      return `${origin.replace(/\/$/, '')}/api/auth/github/callback`;
+      return `${origin.replace(/\/$/, '')}/auth/github/callback`;
     })();
 
   try {
@@ -106,12 +103,12 @@ async function handler(req, res) {
     res.setHeader('Location', authorizeUrl);
     return res.status(302).end();
   } catch (err) {
-    console.error('GET /api/v1/auth/github/login error:', err);
+    console.error('GET /auth/github error:', err);
     return res.status(500).json({ status: 'error', message: 'Internal server error' });
   }
 }
 
 module.exports = applyObservability(handler, {
-  routeId: 'GET /api/v1/auth/github/login',
+  routeId: 'GET /auth/github',
   policy: RATE_LIMIT_POLICIES.authStrict,
 });

@@ -38,7 +38,7 @@ async function handler(req, res) {
   try {
     config = getAuthConfig();
   } catch (err) {
-    console.error('GET /api/v1/auth/github/callback configuration error:', err);
+    console.error('GET /auth/github/callback configuration error:', err);
     return res.status(500).json({ status: 'error', message: 'Auth service misconfigured' });
   }
 
@@ -180,12 +180,12 @@ async function handler(req, res) {
     const portalUrl = process.env.PORTAL_URL || 'http://localhost:4000';
     return res.redirect(302, `${portalUrl}/dashboard`);
   } catch (err) {
-    console.error('GET /api/v1/auth/github/callback error:', err);
+    console.error('GET /auth/github/callback error:', err);
     return res.status(500).json({ status: 'error', message: 'Internal server error' });
   }
 }
 
 module.exports = applyObservability(handler, {
-  routeId: 'GET /api/v1/auth/github/callback',
+  routeId: 'GET /auth/github/callback',
   policy: RATE_LIMIT_POLICIES.authStrict,
 });
