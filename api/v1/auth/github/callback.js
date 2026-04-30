@@ -173,16 +173,10 @@ async function handler(req, res) {
       });
     }
 
-    const cookieHeaders = buildAuthSetCookieHeaders(accessToken, refreshToken, config);
-    console.log('[CALLBACK] 📦 Setting cookies. Count:', cookieHeaders.length);
-    cookieHeaders.forEach((cookie, idx) => {
-      console.log(`[CALLBACK] Cookie ${idx + 1}:`, cookie.substring(0, 80) + '...');
-    });
-    res.setHeader('Set-Cookie', cookieHeaders);
+    res.setHeader('Set-Cookie', buildAuthSetCookieHeaders(accessToken, refreshToken, config));
 
     const portalBaseUrl = String(config.appUrl || '').trim().replace(/\/+$/, '');
     const portalLoginUrl = portalBaseUrl ? `${portalBaseUrl}/login` : '/login';
-    console.log('[CALLBACK] 🔄 Redirecting to portal:', portalLoginUrl);
     res.statusCode = 302;
     res.setHeader('Location', portalLoginUrl);
     return res.end();
