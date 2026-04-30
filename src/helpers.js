@@ -4,10 +4,24 @@ function utcNow() {
 
 function parseAllowedOrigins() {
   const raw = process.env.CORS_ALLOWED_ORIGINS || 'http://localhost:4000,http://127.0.0.1:4000';
-  return raw
+  const origins = raw
     .split(',')
     .map((v) => v.trim())
     .filter(Boolean);
+
+  const portalUrl = String(process.env.APP_URL || '').trim();
+  if (portalUrl) {
+    try {
+      const origin = new URL(portalUrl).origin;
+      if (!origins.includes(origin)) {
+        origins.push(origin);
+      }
+    } catch (_err) {
+      // Ignore invalid portal URLs and keep the existing allowlist intact.
+    }
+  }
+
+  return origins;
 }
 
 function formatProfile(p) {
