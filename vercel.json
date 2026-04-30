@@ -47,10 +47,6 @@
     {
       "source": "/api/v1/profiles/export",
       "destination": "/api/profiles/export"
-    },
-    {
-      "source": "/api/users/me",
-      "destination": "/api/users/me"
     }
   ]
 }
