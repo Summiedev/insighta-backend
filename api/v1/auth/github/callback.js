@@ -175,23 +175,11 @@ async function handler(req, res) {
 
     res.setHeader('Set-Cookie', buildAuthSetCookieHeaders(accessToken, refreshToken, config));
 
-    return res.status(200).json({
-      status: 'success',
-      data: {
-        user: {
-          id: user.id,
-          github_id: user.github_id,
-          username: user.username,
-          email: user.email,
-          avatar_url: user.avatar_url || null,
-          role: user.role,
-          is_active: user.is_active !== false,
-          last_login_at: user.last_login_at || null,
-          created_at: user.created_at,
-        },
-        expires_in: ACCESS_TOKEN_TTL_SECONDS,
-      },
-    });
+    const portalBaseUrl = String(config.appUrl || '').trim().replace(/\/+$/, '');
+    const portalLoginUrl = portalBaseUrl ? `${portalBaseUrl}/login` : '/login';
+    res.statusCode = 302;
+    res.setHeader('Location', portalLoginUrl);
+    return res.end();
   } catch (err) {
     console.error('GET /api/v1/auth/github/callback error:', err);
     return res.status(500).json({ status: 'error', message: 'Internal server error' });

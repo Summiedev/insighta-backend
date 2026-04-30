@@ -50,6 +50,7 @@ function getAuthConfig() {
     githubClientSecret: process.env.GITHUB_CLIENT_SECRET,
     githubRedirectUri: process.env.GITHUB_REDIRECT_URI,
     jwtAccessSecret: process.env.JWT_ACCESS_SECRET,
+    appUrl: process.env.APP_URL || '',
     jwtIssuer: process.env.JWT_ISSUER || 'insighta-labs-api',
     tokenHashSecret: process.env.AUTH_TOKEN_HASH_SECRET || process.env.JWT_ACCESS_SECRET,
     cookieDomain: process.env.AUTH_COOKIE_DOMAIN || '',
@@ -182,7 +183,7 @@ function buildAuthSetCookieHeaders(accessToken, refreshToken, config) {
   const baseOptions = {
     httpOnly: true,
     secure: config.cookieSecure,
-    sameSite: 'Strict',
+    sameSite: 'None',
     domain: config.cookieDomain || undefined,
   };
 
@@ -204,7 +205,7 @@ function buildClearAuthCookieHeaders(config) {
   const baseOptions = {
     httpOnly: true,
     secure: config.cookieSecure,
-    sameSite: 'Strict',
+    sameSite: 'None',
     domain: config.cookieDomain || undefined,
     maxAge: 0,
   };
