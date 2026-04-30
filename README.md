@@ -31,8 +31,6 @@ api/
   health.js
   seed.js
   auth/
-    github.js
-    callback.js
     me.js
   v1/
     auth/
@@ -65,11 +63,11 @@ src/
 
 ### Endpoints
 
-- `GET /api/auth/github` or `GET /api/v1/auth/github/login`
-- `GET /api/auth/github/callback` or `GET /api/v1/auth/github/callback`
-- `GET /api/auth/me` or `GET /api/v1/auth/me`
-- `POST /api/v1/auth/refresh`
-- `POST /api/v1/auth/logout`
+- `GET /auth/github`
+- `GET /auth/github/callback`
+- `GET /auth/me`
+- `POST /auth/refresh`
+- `POST /auth/logout`
 
 ### Flow
 
@@ -114,7 +112,7 @@ Collection: `users`
 
 ### Access Control
 
-All `/api/*` endpoints must require authentication and enforce role permissions through the shared auth middleware. The checks are centralized; they are not scattered across each route handler.
+Auth and utility endpoints must require authentication and enforce role permissions through the shared auth middleware. The checks are centralized; they are not scattered across each route handler.
 
 ## Profile APIs
 
@@ -279,7 +277,7 @@ MONGODB_DB=profileapi
 
 GITHUB_CLIENT_ID=<github-client-id>
 GITHUB_CLIENT_SECRET=<github-client-secret>
-GITHUB_REDIRECT_URI=http://localhost:3000/api/auth/github/callback
+GITHUB_REDIRECT_URI=http://localhost:3000/auth/github/callback
 
 JWT_ACCESS_SECRET=<strong-secret>
 JWT_REFRESH_SECRET=<strong-secret>
@@ -318,5 +316,16 @@ This backend implements the TRD requirements for:
 - Rate limiting
 - Structured logging
 - Stable API responses for all clients
+
+## Public Route Summary
+
+The current public surface is:
+
+- Auth: `/auth/github`, `/auth/github/callback`, `/auth/me`, `/auth/refresh`, `/auth/logout`
+- Health: `/health`
+- Seeding: `/seed`
+- Profiles: `/api/profiles`, `/api/profiles/search`, `/api/profiles/export`, `/api/profiles/:id`
+
+Profiles remain the only public family using the `/api` prefix.
 
 It preserves the Stage 2 behavior for filtering, sorting, pagination, and natural language search while adding secure access control on top.
