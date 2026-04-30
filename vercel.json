@@ -1,6 +1,10 @@
 {
   "rewrites": [
     {
+      "source": "/api/auth/me",
+      "destination": "/api/v1/auth/me"
+    },
+    {
       "source": "/api/auth/github",
       "destination": "/api/v1/auth/github/login"
     },
