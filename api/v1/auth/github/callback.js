@@ -77,7 +77,7 @@ async function handler(req, res) {
       });
     }
 
-    const githubAccessToken = await exchangeGithubCodeForToken(config, code, stateDoc.code_verifier, stateDoc.redirect_uri);
+    const githubAccessToken = await exchangeGithubCodeForToken(config, code, stateDoc.code_verifier, stateDoc.github_redirect_uri || config.githubRedirectUri);
     const githubProfile = await fetchGithubUser(githubAccessToken);
     const primaryEmail = await fetchGithubPrimaryEmail(githubAccessToken);
 
@@ -85,6 +85,7 @@ async function handler(req, res) {
     const username = String(githubProfile.login || '').trim();
     if (!githubId || !username) {
       return res.status(502).json({ status: 'error', message: 'Invalid GitHub profile data' });
+      const githubAccessToken = await exchangeGithubCodeForToken(config, code, stateDoc.code_verifier, stateDoc.github_redirect_uri || config.githubRedirectUri);
     }
 
     const existingUser = await users.findOne({ github_id: githubId });

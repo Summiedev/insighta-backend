@@ -54,8 +54,9 @@ async function handler(req, res) {
   // For CLI mode use the provided CLI redirect or configured redirect.
   // For browser mode, build a redirect URI that points to this backend instance
   // so GitHub will callback to the server (not the CLI local callback).
-  const redirectUri = clientMode === 'cli'
-    ? (cliRedirectUri || config.githubRedirectUri)
+    const githubRedirectUri = config.githubRedirectUri;
+    const internalRedirectUri = clientMode === 'cli'
+      ? cliRedirectUri
     : (() => {
       const proto = (req.headers['x-forwarded-proto'] || req.headers['x-forwarded-protocol'] || 'http').split(',')[0].trim();
       const host = req.headers['x-forwarded-host'] || req.headers.host || `localhost:${process.env.PORT || 3000}`;
@@ -71,12 +72,22 @@ async function handler(req, res) {
       state_hash: stateHash,
       code_verifier: codeVerifier,
       client_mode: clientMode,
-      redirect_uri: redirectUri,
+        redirect_uri: internalRedirectUri,
       created_at: utcNow(),
       expires_at: utcDatePlusSeconds(STATE_TTL_SECONDS),
     });
 
-    const authorizeUrl = buildGithubAuthorizeUrl({ ...config, githubRedirectUri: redirectUri }, state, codeChallenge);
+      const authorizeUrl = buildGithubAuthorizeUrl(config, state, codeChallenge);
+      await db.collection('auth_states').insertOne({
+        id: uuidv7(),
+        state_hash: stateHash,
+        code_verifier: codeVerifier,
+        client_mode: clientMode,
+        github_redirect_uri: githubRedirectUri,
+        internal_redirect_uri: internalRedirectUri,
+        created_at: utcNow(),
+        expires_at: utcDatePlusSeconds(STATE_TTL_SECONDS),
+      });
 
     if (clientMode === 'cli') {
       return res.status(200).json({
