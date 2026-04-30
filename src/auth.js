@@ -46,20 +46,7 @@ function getAuthConfig() {
   }
 
   const appUrl = process.env.APP_URL || '';
-  let cookieDomain = process.env.AUTH_COOKIE_DOMAIN || '';
-
-  if (!cookieDomain && appUrl) {
-    try {
-      const host = new URL(appUrl).hostname.toLowerCase();
-      if (host === 'localhost' || host === '127.0.0.1') {
-        cookieDomain = '';
-      } else if (host.endsWith('.vercel.app')) {
-        cookieDomain = '.vercel.app';
-      }
-    } catch (_err) {
-      // Keep the cookie host-only if APP_URL is invalid.
-    }
-  }
+  const cookieDomain = process.env.AUTH_COOKIE_DOMAIN || '';
 
   return {
     githubClientId: process.env.GITHUB_CLIENT_ID,
