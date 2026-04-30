@@ -33,8 +33,14 @@ async function handler(req, res) {
     : 'browser';
 
   const cliRedirectUri = String(req.query.redirect_uri || req.query.redirectUri || '').trim();
-  if (clientMode === 'cli' && cliRedirectUri && !/^https?:\/\/(127\.0\.0\.1|localhost)(:\d+)?\/(callback|api\/auth\/github\/callback|api\/auth\/callback\/github)\/?$/i.test(cliRedirectUri)) {
-    return res.status(400).json({ status: 'error', message: 'Invalid query parameters' });
+  if (clientMode === 'cli' && cliRedirectUri) {
+    const isLocalCallback = /^https?:\/\/(127\.0\.0\.1|localhost)(:\d+)?\/(callback|api\/auth\/github\/callback|api\/auth\/callback\/github)\/?$/i.test(cliRedirectUri);
+    const isDeployedCallback = cliRedirectUri === 'https://insighta-backend-mauve.vercel.app/api/v1/auth/github/callback'
+      || cliRedirectUri === 'https://insighta-backend-mauve.vercel.app/api/auth/github/callback';
+
+    if (!isLocalCallback && !isDeployedCallback) {
+      return res.status(400).json({ status: 'error', message: 'Invalid query parameters' });
+    }
   }
 
   const suppliedState = String(req.query.state || '').trim();
