@@ -16,8 +16,19 @@ function readAccessToken(req) {
     return authHeader.slice(7).trim();
   }
 
+  const cookieHeader = req.headers.cookie || '';
+  console.log('[AUTH] 🔍 Cookie header:', cookieHeader ? `"${cookieHeader}"` : '<EMPTY>');
+  
   const cookies = parseCookies(req);
-  return (cookies.access_token || '').trim();
+  const token = (cookies.access_token || '').trim();
+  
+  if (!token) {
+    console.error('[AUTH] ❌ NO_TOKEN - access_token cookie not found. Available cookies:', Object.keys(cookies));
+  } else {
+    console.log('[AUTH] ✅ Found access_token cookie, length:', token.length);
+  }
+  
+  return token;
 }
 
 function authenticate() {

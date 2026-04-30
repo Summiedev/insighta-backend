@@ -5,6 +5,7 @@ const { applyObservability, RATE_LIMIT_POLICIES } = require('../../../../src/mid
 const {
   ACCESS_TOKEN_TTL_SECONDS,
   REFRESH_TOKEN_TTL_SECONDS,
+  buildAuthSetCookieHeaders,
   createAccessToken,
   exchangeGithubCodeForToken,
   fetchGithubPrimaryEmail,
@@ -172,16 +173,18 @@ async function handler(req, res) {
       });
     }
 
-    // For web portal: store tokens and include in redirect URL as query params
-    // Portal will extract and store in localStorage, then use Authorization header
-    const portalBaseUrl = String(config.appUrl || '').trim().replace(/\/+$/, '');
-    const portalCallbackPath = '/auth/callback';
-    const redirectUrl = portalBaseUrl
-      ? `${portalBaseUrl}${portalCallbackPath}?access_token=${encodeURIComponent(accessToken)}&refresh_token=${encodeURIComponent(refreshToken)}&token_type=Bearer`
-      : `/auth/callback?access_token=${encodeURIComponent(accessToken)}&refresh_token=${encodeURIComponent(refreshToken)}&token_type=Bearer`;
+    const cookieHeaders = buildAuthSetCookieHeaders(accessToken, refreshToken, config);
+    console.log('[CALLBACK] 📦 Setting cookies. Count:', cookieHeaders.length);
+    cookieHeaders.forEach((cookie, idx) => {
+      console.log(`[CALLBACK] Cookie ${idx + 1}:`, cookie.substring(0, 80) + '...');
+    });
+    res.setHeader('Set-Cookie', cookieHeaders);
 
+    const portalBaseUrl = String(config.appUrl || '').trim().replace(/\/+$/, '');
+    const portalLoginUrl = portalBaseUrl ? `${portalBaseUrl}/login` : '/login';
+    console.log('[CALLBACK] 🔄 Redirecting to portal:', portalLoginUrl);
     res.statusCode = 302;
-    res.setHeader('Location', redirectUrl);
+    res.setHeader('Location', portalLoginUrl);
     return res.end();
   } catch (err) {
     console.error('GET /api/v1/auth/github/callback error:', err);
