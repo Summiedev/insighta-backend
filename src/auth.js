@@ -45,31 +45,14 @@ function getAuthConfig() {
     throw new Error(`Missing required auth environment variables: ${missing.join(', ')}`);
   }
 
-  const appUrl = process.env.APP_URL || '';
-  let cookieDomain = process.env.AUTH_COOKIE_DOMAIN || '';
-
-  if (!cookieDomain && appUrl) {
-    try {
-      const host = new URL(appUrl).hostname.toLowerCase();
-      if (host === 'localhost' || host === '127.0.0.1') {
-        cookieDomain = '';
-      } else if (host.endsWith('.vercel.app')) {
-        cookieDomain = '.vercel.app';
-      }
-    } catch (_err) {
-      // Keep the cookie host-only if APP_URL is invalid.
-    }
-  }
-
   return {
     githubClientId: process.env.GITHUB_CLIENT_ID,
     githubClientSecret: process.env.GITHUB_CLIENT_SECRET,
     githubRedirectUri: process.env.GITHUB_REDIRECT_URI,
     jwtAccessSecret: process.env.JWT_ACCESS_SECRET,
-    appUrl,
     jwtIssuer: process.env.JWT_ISSUER || 'insighta-labs-api',
     tokenHashSecret: process.env.AUTH_TOKEN_HASH_SECRET || process.env.JWT_ACCESS_SECRET,
-    cookieDomain,
+    cookieDomain: process.env.AUTH_COOKIE_DOMAIN || '',
     cookieSecure: parseBooleanEnv(process.env.AUTH_COOKIE_SECURE, true),
     adminGithubIds: splitCsv(process.env.AUTH_ADMIN_GITHUB_IDS),
     adminGithubUsernames: splitCsvLower(process.env.AUTH_ADMIN_GITHUB_USERNAMES),

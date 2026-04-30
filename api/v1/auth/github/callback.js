@@ -77,7 +77,7 @@ async function handler(req, res) {
       });
     }
 
-    const githubAccessToken = await exchangeGithubCodeForToken(config, code, stateDoc.code_verifier, stateDoc.github_redirect_uri || config.githubRedirectUri);
+    const githubAccessToken = await exchangeGithubCodeForToken(config, code, stateDoc.code_verifier, stateDoc.redirect_uri);
     const githubProfile = await fetchGithubUser(githubAccessToken);
     const primaryEmail = await fetchGithubPrimaryEmail(githubAccessToken);
 
@@ -85,7 +85,6 @@ async function handler(req, res) {
     const username = String(githubProfile.login || '').trim();
     if (!githubId || !username) {
       return res.status(502).json({ status: 'error', message: 'Invalid GitHub profile data' });
-      const githubAccessToken = await exchangeGithubCodeForToken(config, code, stateDoc.code_verifier, stateDoc.github_redirect_uri || config.githubRedirectUri);
     }
 
     const existingUser = await users.findOne({ github_id: githubId });
@@ -176,11 +175,8 @@ async function handler(req, res) {
 
     res.setHeader('Set-Cookie', buildAuthSetCookieHeaders(accessToken, refreshToken, config));
 
-    const portalBaseUrl = String(config.appUrl || '').trim().replace(/\/+$/, '');
-    const portalLoginUrl = portalBaseUrl ? `${portalBaseUrl}/login` : '/login';
-    res.statusCode = 302;
-    res.setHeader('Location', portalLoginUrl);
-    return res.end();
+    const portalUrl = process.env.PORTAL_URL || 'http://localhost:4000';
+    return res.redirect(302, `${portalUrl}/dashboard`);
   } catch (err) {
     console.error('GET /api/v1/auth/github/callback error:', err);
     return res.status(500).json({ status: 'error', message: 'Internal server error' });
