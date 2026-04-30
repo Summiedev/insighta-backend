@@ -33,11 +33,8 @@ async function handler(req, res) {
     : 'browser';
 
   const cliRedirectUri = String(req.query.redirect_uri || req.query.redirectUri || '').trim();
-  if (clientMode === 'cli' && cliRedirectUri) {
-    const isValidCallback = cliRedirectUri.includes('/api/auth/github/callback') || cliRedirectUri.includes('/api/v1/auth/github/callback');
-    if (!isValidCallback || !cliRedirectUri.startsWith('http')) {
-      return res.status(400).json({ status: 'error', message: 'Invalid query parameters' });
-    }
+  if (clientMode === 'cli' && cliRedirectUri && !/^https?:\/\/(127\.0\.0\.1|localhost)(:\d+)?\/(callback|api\/auth\/github\/callback|api\/auth\/callback\/github)\/?$/i.test(cliRedirectUri)) {
+    return res.status(400).json({ status: 'error', message: 'Invalid query parameters' });
   }
 
   const suppliedState = String(req.query.state || '').trim();

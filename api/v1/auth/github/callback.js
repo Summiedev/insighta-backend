@@ -27,11 +27,8 @@ async function handler(req, res) {
 
   const code = String(req.query.code || '').trim();
   const state = String(req.query.state || '').trim();
-  const pollOnly = String(req.query.poll || '').trim() === '1' || String(req.query.poll || '').trim().toLowerCase() === 'true';
   if (!code || !state) {
-    if (!pollOnly || !state) {
-      return res.status(400).json({ status: 'error', message: 'Invalid query parameters' });
-    }
+    return res.status(400).json({ status: 'error', message: 'Invalid query parameters' });
   }
 
   let config;
@@ -59,23 +56,7 @@ async function handler(req, res) {
       return res.status(400).json({ status: 'error', message: 'State expired' });
     }
 
-    if (pollOnly) {
-      const storedResult = stateDoc.cli_result;
-      if (!storedResult || !storedResult.access_token || !storedResult.refresh_token) {
-        return res.status(202).json({ status: 'pending', message: 'Authorization still in progress' });
-      }
-
-      await authStates.deleteOne({ _id: stateDoc._id });
-      return res.status(200).json({
-        status: 'success',
-        access_token: storedResult.access_token,
-        refresh_token: storedResult.refresh_token,
-        token_type: storedResult.token_type || 'Bearer',
-        expires_in: storedResult.expires_in || ACCESS_TOKEN_TTL_SECONDS,
-        refresh_expires_in: storedResult.refresh_expires_in || REFRESH_TOKEN_TTL_SECONDS,
-        user: storedResult.user,
-      });
-    }
+    await authStates.deleteOne({ _id: stateDoc._id });
 
     const githubAccessToken = await exchangeGithubCodeForToken(config, code, stateDoc.code_verifier, stateDoc.redirect_uri);
     const githubProfile = await fetchGithubUser(githubAccessToken);
@@ -140,36 +121,24 @@ async function handler(req, res) {
 
     const cliMode = stateDoc.client_mode === 'cli';
     if (cliMode) {
-      await authStates.updateOne(
-        { _id: stateDoc._id },
-        {
-          $set: {
-            cli_result: {
-              access_token: accessToken,
-              refresh_token: refreshToken,
-              token_type: 'Bearer',
-              expires_in: ACCESS_TOKEN_TTL_SECONDS,
-              refresh_expires_in: REFRESH_TOKEN_TTL_SECONDS,
-              user: {
-                id: user.id,
-                github_id: user.github_id,
-                username: user.username,
-                email: user.email,
-                avatar_url: user.avatar_url || null,
-                role: user.role,
-                is_active: user.is_active !== false,
-                last_login_at: user.last_login_at || null,
-                created_at: user.created_at,
-              },
-            },
-            cli_result_created_at: utcNow(),
-          },
-        }
-      );
-
       return res.status(200).json({
         status: 'success',
-        message: 'Authorization complete. Return to the CLI to finish login.',
+        access_token: accessToken,
+        refresh_token: refreshToken,
+        token_type: 'Bearer',
+        expires_in: ACCESS_TOKEN_TTL_SECONDS,
+        refresh_expires_in: REFRESH_TOKEN_TTL_SECONDS,
+        user: {
+          id: user.id,
+          github_id: user.github_id,
+          username: user.username,
+          email: user.email,
+          avatar_url: user.avatar_url || null,
+          role: user.role,
+          is_active: user.is_active !== false,
+          last_login_at: user.last_login_at || null,
+          created_at: user.created_at,
+        },
       });
     }
 
