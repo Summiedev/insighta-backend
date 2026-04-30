@@ -169,7 +169,22 @@ async function handler(req, res) {
 
       return res.status(200).json({
         status: 'success',
-        message: 'Authorization complete. Return to the CLI to finish login.',
+        access_token: accessToken,
+        refresh_token: refreshToken,
+        token_type: 'Bearer',
+        expires_in: ACCESS_TOKEN_TTL_SECONDS,
+        refresh_expires_in: REFRESH_TOKEN_TTL_SECONDS,
+        user: {
+          id: user.id,
+          github_id: user.github_id,
+          username: user.username,
+          email: user.email,
+          avatar_url: user.avatar_url || null,
+          role: user.role,
+          is_active: user.is_active !== false,
+          last_login_at: user.last_login_at || null,
+          created_at: user.created_at,
+        },
       });
     }
 
