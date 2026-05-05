@@ -328,4 +328,22 @@ The current public surface is:
 
 Profiles remain the only public family using the `/api` prefix.
 
+## Submission Bundle
+
+Use these values when submitting Stage 3:
+
+- Backend repo: https://github.com/Summiedev/insighta-backend.git
+- CLI repo: https://github.com/Summiedev/insighta-cli.git
+- Portal repo: https://github.com/Summiedev/insighta-portal.git
+- Live backend: https://insighta-backend-mauve.vercel.app
+- Live portal: https://insighta-portal-seven.vercel.app
+
+Verification completed in this workspace:
+
+- Backend auth endpoints and protected profile APIs responded correctly with a valid admin token.
+- CLI `whoami` and `logout` completed successfully against the live backend.
+- Portal loaded successfully at the production URL.
+
+Provide the admin and analyst test tokens separately in the submission form if the grader asks for them. Do not commit secrets into the repository.
+
 It preserves the Stage 2 behavior for filtering, sorting, pagination, and natural language search while adding secure access control on top.

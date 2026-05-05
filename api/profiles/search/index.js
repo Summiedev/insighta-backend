@@ -3,6 +3,8 @@ const { parseNL } = require('../../../src/nlParser');
 const { buildQuery } = require('../../../src/queryBuilder');
 const { formatProfile, requireApiVersion, setCors } = require('../../../src/helpers');
 const { protect } = require('../../../src/middleware/auth');
+const { normalizeFilters, canonicalKeyFromNormalized } = require('../../../src/queryNormalizer');
+const { get: cacheGet, set: cacheSet } = require('../../../src/queryCache');
 
 async function handler(req, res) {
   setCors(res, req);
@@ -32,9 +34,17 @@ async function handler(req, res) {
     order: req.query.order,
   };
 
+  // Normalize and cache key
+  const normalized = normalizeFilters(merged);
+  const cacheKey = canonicalKeyFromNormalized(normalized);
+  const cached = cacheGet(cacheKey);
+  if (cached) {
+    return res.status(200).json(cached);
+  }
+
   let queryComponents;
   try {
-    queryComponents = buildQuery(merged);
+    queryComponents = buildQuery(normalized);
   } catch (err) {
     return res.status(err.status || 422).json({ status: 'error', message: err.message });
   }
@@ -69,7 +79,7 @@ async function handler(req, res) {
       return `/api/profiles/search?${params.toString()}`;
     };
 
-    return res.status(200).json({
+    const resp = {
       status: 'success',
       page: Number(page),
       limit: Number(limit),
@@ -81,7 +91,9 @@ async function handler(req, res) {
         prev: makeLink(page - 1),
       },
       data: rows.map(formatProfile),
-    });
+    };
+    try { cacheSet(cacheKey, resp, 5000); } catch (_) {}
+    return res.status(200).json(resp);
   } catch (err) {
     console.error('GET /api/profiles/search error:', err);
     return res.status(500).json({ status: 'error', message: 'Internal server error' });
